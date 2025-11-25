@@ -2,7 +2,7 @@ import { initTRPC, TRPCError } from '@trpc/server';
 import { prisma } from '@/lib/db';
 import { getSessionFromRequest } from './utils/session';
 
-export async function createTRPCContext(opts: { req: Request; res?: any }) {
+export async function createTRPCContext(opts: { req: Request; res?: unknown }) {
   const session = await getSessionFromRequest(opts.req);
 
   return {

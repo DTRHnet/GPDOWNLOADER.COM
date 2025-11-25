@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import type { TabListItem } from '@/lib/types';
 
 export default function ArtistPage({ params }: { params: Promise<{ name: string }> }) {
   const { name } = use(params);
@@ -42,7 +43,7 @@ export default function ArtistPage({ params }: { params: Promise<{ name: string 
       {data && data.tabs.length > 0 ? (
         <>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mb-8">
-            {data.tabs.map((tab: any) => (
+            {data.tabs.map((tab: TabListItem) => (
               <Card key={tab.id}>
                 <CardHeader>
                   <CardTitle className="text-lg">

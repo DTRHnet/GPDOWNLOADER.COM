@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import Image from 'next/image';
 import { trpc } from '@/app/providers';
 
 export function AdDisplay({ position }: { position: string }) {
@@ -49,11 +50,16 @@ export function AdDisplay({ position }: { position: string }) {
     return (
       <div className="ad-container border rounded-lg p-4 bg-muted/50">
         {ad.imageUrl && (
-          <img
-            src={ad.imageUrl}
-            alt={ad.title || 'Advertisement'}
-            className="w-full h-auto mb-2 rounded"
-          />
+          <div className="relative w-full h-48 mb-2 rounded overflow-hidden">
+            <Image
+              src={ad.imageUrl}
+              alt={ad.title || 'Advertisement'}
+              fill
+              className="object-contain"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              unoptimized
+            />
+          </div>
         )}
         {ad.title && <h3 className="font-semibold mb-1">{ad.title}</h3>}
         {ad.content && <p className="text-sm text-muted-foreground mb-2">{ad.content}</p>}

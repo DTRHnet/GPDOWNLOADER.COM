@@ -3,12 +3,13 @@
 import { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { trpc } from '@/app/providers';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { Trash2 } from 'lucide-react';
 import Link from 'next/link';
+import type { AdminTabListItem } from '@/lib/types';
 
 export default function AdminTabsPage() {
   const { data: session, status } = useSession();
@@ -64,7 +65,7 @@ export default function AdminTabsPage() {
       ) : tabs && tabs.tabs.length > 0 ? (
         <>
           <div className="space-y-4 mb-8">
-            {tabs.tabs.map((tab: any) => (
+            {tabs.tabs.map((tab: AdminTabListItem) => (
               <Card key={tab.id}>
                 <CardContent className="pt-6">
                   <div className="flex items-start justify-between">
