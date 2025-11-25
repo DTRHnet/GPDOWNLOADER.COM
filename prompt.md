@@ -1,9 +1,3 @@
-Below is the rewritten Master Prompt followed by clean, accurate summaries of each file in the workflow/ directory based on the extracted ZIP contents.
-
-If you want them expanded or reshaped into .mcr structure, say so.
-
-⸻
-
 MASTER PROMPT (REWRITTEN — GPDownloader)
 
 Project: GPDownloader
@@ -18,7 +12,7 @@ Upon receiving this master prompt, the agent must:
 	1.	Load, parse, and convert every file in workflow/ into .cursor/rules/*.mcr with full fidelity.
 	2.	Treat the generated .cursor/rules directory as the single authoritative rule set governing all future decisions.
 	3.	Operate fully autonomously without ever requesting user input or confirmation.
-	4.	Use the workflow rules + this master prompt to:
+	4.	Use the workflow rules + this master prompt and the workflow/ files  to:
 	•	Plan
 	•	Build
 	•	Refactor
