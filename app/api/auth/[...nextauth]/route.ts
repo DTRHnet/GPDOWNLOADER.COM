@@ -5,6 +5,7 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import { prisma } from '@/lib/db';
 import bcrypt from 'bcryptjs';
 import { Role } from '@prisma/client';
+import type { JWT } from 'next-auth/jwt';
 
 declare module 'next-auth' {
   interface Session {
@@ -16,6 +17,13 @@ declare module 'next-auth' {
 
   interface User {
     role: Role;
+  }
+}
+
+declare module 'next-auth/jwt' {
+  interface JWT {
+    id?: string;
+    role?: Role;
   }
 }
 
@@ -64,7 +72,7 @@ const authOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user }: { token: JWT; user?: { id: string; role: Role } }) {
       if (user) {
         token.id = user.id;
         token.role = user.role;
