@@ -114,7 +114,7 @@ export default function Home() {
           </div>
 
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {data.tabs.map((tab) => (
+            {data.tabs.map((tab: any) => (
               <Card key={tab.id}>
                 <CardHeader>
                   <CardTitle className="text-lg">
