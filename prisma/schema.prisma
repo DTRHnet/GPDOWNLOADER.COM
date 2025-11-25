@@ -1,0 +1,229 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?   // Hashed password for email/password auth
+  role          Role      @default(USER)
+  twoFactorEnabled Boolean @default(false)
+  twoFactorSecret String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts      Account[]
+  sessions      Session[]
+  tabs          Tab[]
+  favorites     Favorite[]
+  ratings       Rating[]
+  comments      Comment[]
+  uploads       Upload[]
+
+  @@index([email])
+  @@index([role])
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([sessionToken])
+}
+
+model Artist {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tabs Tab[]
+
+  @@index([name])
+}
+
+model Tab {
+  id          String   @id @default(cuid())
+  title       String
+  artistId    String
+  artist      Artist   @relation(fields: [artistId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  s3Key       String   @unique
+  s3Bucket    String   @default("gpdownloader-tabs")
+  fileSize    Int      // Size in bytes
+  contentType String   @default("application/x-guitar-pro")
+  version     Int      @default(1)
+  difficulty  Difficulty?
+  instrument  String?
+  genre       String?
+  downloadCount Int    @default(0)
+  averageRating Float? @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  favorites   Favorite[]
+  ratings     Rating[]
+  comments    Comment[]
+
+  @@index([title])
+  @@index([artistId])
+  @@index([userId])
+  @@index([difficulty])
+  @@index([genre])
+  @@index([instrument])
+  @@index([averageRating])
+  @@index([downloadCount])
+  @@index([createdAt])
+}
+
+model Upload {
+  id          String      @id @default(cuid())
+  userId      String
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  filename    String
+  s3Key       String
+  s3Bucket    String      @default("gpdownloader-tabs")
+  fileSize    Int
+  contentType String
+  status      UploadStatus @default(PENDING)
+  title       String?
+  artistName  String?
+  instrument  String?
+  genre       String?
+  difficulty  Difficulty?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model Favorite {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tabId     String
+  tab       Tab      @relation(fields: [tabId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, tabId])
+  @@index([userId])
+  @@index([tabId])
+}
+
+model Rating {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tabId     String
+  tab       Tab      @relation(fields: [tabId], references: [id], onDelete: Cascade)
+  value     Int      // 1-5
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, tabId])
+  @@index([userId])
+  @@index([tabId])
+  @@index([value])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tabId     String
+  tab       Tab      @relation(fields: [tabId], references: [id], onDelete: Cascade)
+  content   String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([tabId])
+  @@index([createdAt])
+}
+
+model Ad {
+  id          String   @id @default(cuid())
+  type        AdType
+  position    String
+  title       String?
+  content     String?  @db.Text
+  imageUrl    String?
+  linkUrl     String?
+  script      String?  @db.Text // For custom ad scripts
+  isActive    Boolean  @default(true)
+  impressions Int      @default(0)
+  clicks      Int      @default(0)
+  revenue     Float    @default(0)
+  startDate   DateTime?
+  endDate     DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([type])
+  @@index([position])
+  @@index([isActive])
+}
+
+enum Role {
+  USER
+  MODERATOR
+  ADMIN
+}
+
+enum Difficulty {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  EXPERT
+}
+
+enum UploadStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum AdType {
+  ADSENSE
+  CUSTOM
+  FACEBOOK
+  AMAZON
+}
