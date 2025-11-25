@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
+import type { TabListItem } from '@/lib/types';
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -114,7 +115,7 @@ export default function Home() {
           </div>
 
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {data.tabs.map((tab: any) => (
+            {data.tabs.map((tab: TabListItem) => (
               <Card key={tab.id}>
                 <CardHeader>
                   <CardTitle className="text-lg">

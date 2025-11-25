@@ -61,10 +61,10 @@ export default function TabDetailPage({ params }: { params: Promise<{ id: string
       const result = await utils.tabs.getDownloadUrl.fetch({ id });
       window.open(result.url, '_blank');
       toast({ title: 'Download started' });
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: 'Download failed',
-        description: error.message,
+        description: error instanceof Error ? error.message : 'An unknown error occurred',
         variant: 'destructive',
       });
     }

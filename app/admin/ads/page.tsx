@@ -19,6 +19,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { Plus, Edit, Trash2, DollarSign } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import type { AdListItem } from '@/lib/types';
 
 export default function AdsPanelPage() {
   const { data: session, status } = useSession();
@@ -26,7 +27,7 @@ export default function AdsPanelPage() {
   const { toast } = useToast();
   const [page, setPage] = useState(1);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [editingAd, setEditingAd] = useState<any>(null);
+  const [editingAd, setEditingAd] = useState<AdListItem | null>(null);
   const [formData, setFormData] = useState({
     type: 'CUSTOM' as 'ADSENSE' | 'CUSTOM' | 'FACEBOOK' | 'AMAZON',
     position: '',
@@ -111,7 +112,7 @@ export default function AdsPanelPage() {
     }
   };
 
-  const handleEdit = (ad: any) => {
+  const handleEdit = (ad: AdListItem) => {
     setEditingAd(ad);
     setFormData({
       type: ad.type,

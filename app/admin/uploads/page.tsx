@@ -3,11 +3,12 @@
 import { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { trpc } from '@/app/providers';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { Check, X } from 'lucide-react';
+import type { AdminUploadListItem } from '@/lib/types';
 
 export default function AdminUploadsPage() {
   const { data: session, status } = useSession();
@@ -92,7 +93,7 @@ export default function AdminUploadsPage() {
       ) : uploads && uploads.uploads.length > 0 ? (
         <>
           <div className="space-y-4 mb-8">
-            {uploads.uploads.map((upload: any) => (
+            {uploads.uploads.map((upload: AdminUploadListItem) => (
               <Card key={upload.id}>
                 <CardHeader>
                   <CardTitle>{upload.title || upload.filename}</CardTitle>
