@@ -26,7 +26,7 @@
   for = "/*"
   [headers.values]
     Strict-Transport-Security = "max-age=31536000; includeSubDomains"
-  force = true
+  force = "true"
 
 # Cache configuration for better performance
 [[headers]]
