@@ -1,4 +1,4 @@
-import { handlers, type DefaultSession } from 'next-auth';
+import NextAuth, { type DefaultSession } from 'next-auth';
 import { PrismaAdapter } from '@auth/prisma-adapter';
 import GoogleProvider from 'next-auth/providers/google';
 import CredentialsProvider from 'next-auth/providers/credentials';
@@ -89,4 +89,6 @@ const authOptions = {
   secret: process.env.NEXTAUTH_SECRET,
 };
 
-export const { GET, POST } = handlers(authOptions);
+const handler = NextAuth(authOptions);
+
+export const { GET, POST } = handler;
