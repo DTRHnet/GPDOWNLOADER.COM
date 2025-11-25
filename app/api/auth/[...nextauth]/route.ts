@@ -1,4 +1,4 @@
-import NextAuth, { type DefaultSession, type Session } from 'next-auth';
+import NextAuth, { type DefaultSession, type Session, type AuthOptions, type User as NextAuthUser } from 'next-auth';
 import { PrismaAdapter } from '@auth/prisma-adapter';
 import GoogleProvider from 'next-auth/providers/google';
 import CredentialsProvider from 'next-auth/providers/credentials';
@@ -16,6 +16,7 @@ declare module 'next-auth' {
   }
 
   interface User {
+    id: string;
     role: Role;
   }
 }
@@ -27,7 +28,7 @@ declare module 'next-auth/jwt' {
   }
 }
 
-const authOptions = {
+const authOptions: AuthOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
     GoogleProvider({
@@ -72,14 +73,17 @@ const authOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user }: { token: JWT; user?: { id: string; role: Role } }) {
+    async jwt({ token, user }) {
       if (user) {
-        token.id = user.id;
-        token.role = user.role;
+        // Type assertion needed because NextAuth's User type may not include id/role
+        // but our module augmentation and adapter ensure they exist
+        const userWithRole = user as NextAuthUser & { id: string; role: Role };
+        token.id = userWithRole.id;
+        token.role = userWithRole.role;
       }
       return token;
     },
-    async session({ session, token }: { session: Session; token: JWT }) {
+    async session({ session, token }) {
       if (session.user && token) {
         session.user.id = token.id as string;
         session.user.role = token.role as Role;
