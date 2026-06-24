@@ -1,21 +1,20 @@
-import { eq } from "drizzle-orm";
+import { eq, desc, and, like } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
+import { InsertUser, users, artists, tabs, uploads, favorites, ratings, comments, ads, playlists, playlistTabs, campaigns, analytics, InsertArtist, InsertTab, InsertUpload, InsertFavorite, InsertRating, InsertComment, InsertAd, InsertPlaylist, InsertPlaylistTab, InsertCampaign, InsertAnalytic } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
-let _db: ReturnType<typeof drizzle> | null = null;
+let dbInstance: ReturnType<typeof drizzle> | null = null;
 
-// Lazily create the drizzle instance so local tooling can run without a DB.
 export async function getDb() {
-  if (!_db && process.env.DATABASE_URL) {
+  if (!dbInstance && process.env.DATABASE_URL) {
     try {
-      _db = drizzle(process.env.DATABASE_URL);
+      dbInstance = drizzle(process.env.DATABASE_URL);
     } catch (error) {
       console.warn("[Database] Failed to connect:", error);
-      _db = null;
+      dbInstance = null;
     }
   }
-  return _db;
+  return dbInstance;
 }
 
 export async function upsertUser(user: InsertUser): Promise<void> {
@@ -89,4 +88,130 @@ export async function getUserByOpenId(openId: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
-// TODO: add feature queries here as your schema grows.
+export async function createArtist(artist: InsertArtist): Promise<void> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot create artist: database not available");
+    return;
+  }
+  await db.insert(artists).values(artist);
+}
+
+export async function getArtistByName(name: string) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get artist: database not available");
+    return undefined;
+  }
+  const result = await db.select().from(artists).where(eq(artists.name, name)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function createTab(tab: InsertTab): Promise<void> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot create tab: database not available");
+    return;
+  }
+  await db.insert(tabs).values(tab);
+}
+
+export async function createUpload(upload: InsertUpload): Promise<void> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot create upload: database not available");
+    return;
+  }
+  await db.insert(uploads).values(upload);
+}
+
+export async function addFavorite(favorite: InsertFavorite): Promise<void> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot add favorite: database not available");
+    return;
+  }
+  await db.insert(favorites).values(favorite);
+}
+
+export async function addRating(rating: InsertRating): Promise<void> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot add rating: database not available");
+    return;
+  }
+  await db.insert(ratings).values(rating);
+}
+
+export async function addComment(comment: InsertComment): Promise<void> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot add comment: database not available");
+    return;
+  }
+  await db.insert(comments).values(comment);
+}
+
+export async function createAd(ad: InsertAd): Promise<void> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot create ad: database not available");
+    return;
+  }
+  await db.insert(ads).values(ad);
+}
+
+export async function getAdByPosition(position: string) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get ad: database not available");
+    return undefined;
+  }
+  const result = await db.select().from(ads).where(eq(ads.position, position)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function createPlaylist(playlist: InsertPlaylist): Promise<void> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot create playlist: database not available");
+    return;
+  }
+  await db.insert(playlists).values(playlist);
+}
+
+export async function getPlaylistsByUser(userId: number) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get playlists: database not available");
+    return [];
+  }
+  return await db.select().from(playlists).where(eq(playlists.userId, userId));
+}
+
+export async function addTabToPlaylist(playlistTab: InsertPlaylistTab): Promise<void> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot add tab to playlist: database not available");
+    return;
+  }
+  await db.insert(playlistTabs).values(playlistTab);
+}
+
+export async function createCampaign(campaign: InsertCampaign): Promise<void> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot create campaign: database not available");
+    return;
+  }
+  await db.insert(campaigns).values(campaign);
+}
+
+export async function trackAnalytic(analytic: InsertAnalytic): Promise<void> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot track analytic: database not available");
+    return;
+  }
+  await db.insert(analytics).values(analytic);
+}
